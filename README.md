@@ -1,13 +1,16 @@
-# Connect Four in the Terminal 🔴🟡
+# FourStack - A Four-in-a-Row Game for your Terminal 🔴🟡
 
 ## About ℹ️
 
-A terminal-based implementation of the [Connect Four](https://en.wikipedia.org/wiki/Connect_Four) game.
+A terminal-based implementation of the classic Four-in-a-Row game, most commonly known as [Connect Four](https://en.wikipedia.org/wiki/Connect_Four).
 
 ## Features 🔔
 
-- Runs directly in your CLI
-- Play with a friend (TODO) or alone against AI (TODO)
++ Runs directly in your CLI
++ Multiple ways to play
+  + With a friend locally (TODO)
+  + Against AI (TODO)
+  + Online against a friend (TODO) or with random matchmaking (TODO)
 
 ## Usage 🛠️
 
@@ -19,4 +22,4 @@ There are currently no pre-built releases for this project yet, so you must comp
 
 1. Download this project via Git
 2. In your terminal, navigate to the project directory and execute `cargo run`. That's it!
-3. Optionally, if you'd like to install this program to run it from anywhere in your terminal, execute `cargo install --path <path/to/project/dir>`. To uninstall the program, run `cargo uninstall connect_four`.
+3. Optionally, if you'd like to install this program to run it from anywhere in your terminal, execute `cargo install --path <path/to/project/dir>`. To uninstall the program, run `cargo uninstall fourstack`.
