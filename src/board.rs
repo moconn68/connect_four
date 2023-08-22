@@ -59,6 +59,16 @@ impl Display for BoardSpace {
     }
 }
 
+/// Used when checking if a [`BoardSpace`] contains some [`GamePiece`].
+impl PartialEq<BoardSpace> for GamePiece {
+    fn eq(&self, other: &BoardSpace) -> bool {
+        match other {
+            BoardSpace::Empty => false,
+            BoardSpace::Piece(p) => self.eq(p),
+        }
+    }
+}
+
 type BoardColumns = [BoardSpace; GRID_COLS];
 type GameGrid = [BoardColumns; GRID_ROWS];
 
@@ -85,6 +95,102 @@ impl GameBoard {
         }
         // No spaces in given column left to put piece into
         Err(InsertError::FullColumn)
+    }
+
+    /// Checks if there is a winner in the current game state.
+    /// Checks for four like pieces in a row horizontally, vertically, and diagonally.
+    ///
+    /// Returns an [`Option`] containing the [`GamePiece`] of the winning player, or [`None`] if there is no winner.
+    // TODO remove cfg(test) when game loop is implemented
+    #[cfg(test)]
+    fn is_winner(&self) -> Option<GamePiece> {
+        // Horizontal
+        for row in 0..GRID_ROWS {
+            for col in 0..GRID_COLS - 3 {
+                match self.grid[row][col] {
+                    BoardSpace::Empty => (),
+                    BoardSpace::Piece(piece) => {
+                        if piece == self.grid[row][col + 1]
+                            && piece == self.grid[row][col + 2]
+                            && piece == self.grid[row][col + 3]
+                        {
+                            return Some(piece);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Vertical
+        for row in 0..GRID_ROWS - 3 {
+            for col in 0..GRID_COLS {
+                match self.grid[row][col] {
+                    BoardSpace::Empty => (),
+                    BoardSpace::Piece(piece) => {
+                        if piece == self.grid[row + 1][col]
+                            && piece == self.grid[row + 2][col]
+                            && piece == self.grid[row + 3][col]
+                        {
+                            return Some(piece);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Diagonal up
+        for row in 0..GRID_ROWS - 3 {
+            for col in 3..GRID_COLS {
+                match self.grid[row][col] {
+                    BoardSpace::Empty => (),
+                    BoardSpace::Piece(piece) => {
+                        if piece == self.grid[row + 1][col - 1]
+                            && piece == self.grid[row + 2][col - 2]
+                            && piece == self.grid[row + 3][col - 3]
+                        {
+                            return Some(piece);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Diagonal down
+        for row in 3..GRID_ROWS {
+            for col in 3..GRID_COLS {
+                match self.grid[row][col] {
+                    BoardSpace::Empty => (),
+                    BoardSpace::Piece(piece) => {
+                        if piece == self.grid[row - 1][col - 1]
+                            && piece == self.grid[row - 2][col - 2]
+                            && piece == self.grid[row - 3][col - 3]
+                        {
+                            return Some(piece);
+                        }
+                    }
+                }
+            }
+        }
+
+        // All win condition checks failed - no one has won yet!
+        None
+    }
+
+    /// Checks if the board is full by seeing if the topmost row is full.
+    // TODO remove cfg(test) when game loop is implemented
+    #[cfg(test)]
+    fn is_full(&self) -> bool {
+        for space in self.grid[0] {
+            if BoardSpace::Empty == space {
+                return false;
+            }
+        }
+        true
+    }
+
+    #[cfg(test)]
+    fn new(grid: GameGrid) -> Self {
+        Self { grid }
     }
 }
 
@@ -177,5 +283,111 @@ mod tests {
         let mut board = GameBoard::default();
         let bad_insert = board.insert_piece(GamePiece::Red, 8);
         assert!(bad_insert.is_err());
+    }
+
+    #[test]
+    fn is_full_empty() {
+        assert!(!GameBoard::default().is_full());
+    }
+
+    #[test]
+    fn is_full_full() {
+        let grid: GameGrid = [[BoardSpace::Piece(GamePiece::Red); 7]; 6];
+        let board = GameBoard::new(grid);
+
+        assert!(board.is_full());
+    }
+
+    #[test]
+    fn is_full_incomplete() {
+        let mut board = GameBoard::default();
+
+        for col in 1..GRID_COLS {
+            for _ in 0..GRID_ROWS {
+                board.insert_piece(GamePiece::Red, col).unwrap();
+            }
+        }
+        for _ in 0..GRID_ROWS - 1 {
+            board.insert_piece(GamePiece::Red, GRID_COLS).unwrap();
+        }
+
+        assert!(!board.is_full());
+    }
+
+    #[test]
+    fn is_winner_empty() {
+        assert_eq!(None, GameBoard::default().is_winner())
+    }
+
+    #[test]
+    fn is_winner_horizonal() {
+        let mut board = GameBoard::default();
+        let piece = GamePiece::Red;
+
+        board.insert_piece(piece, 1).unwrap();
+        board.insert_piece(piece, 2).unwrap();
+        board.insert_piece(piece, 3).unwrap();
+        board.insert_piece(piece, 4).unwrap();
+
+        assert_eq!(Some(piece), board.is_winner());
+    }
+
+    #[test]
+    fn is_winner_vertical() {
+        let mut board = GameBoard::default();
+        let piece = GamePiece::Red;
+
+        board.insert_piece(piece, 1).unwrap();
+        board.insert_piece(piece, 1).unwrap();
+        board.insert_piece(piece, 1).unwrap();
+        board.insert_piece(piece, 1).unwrap();
+
+        assert_eq!(Some(piece), board.is_winner());
+    }
+
+    #[test]
+    fn is_winner_diagonal_up() {
+        let mut board = GameBoard::default();
+        let win_piece = GamePiece::Red;
+        let lose_piece = GamePiece::Yellow;
+
+        board.insert_piece(win_piece, 1).unwrap();
+
+        board.insert_piece(lose_piece, 2).unwrap();
+        board.insert_piece(win_piece, 2).unwrap();
+
+        board.insert_piece(lose_piece, 3).unwrap();
+        board.insert_piece(lose_piece, 3).unwrap();
+        board.insert_piece(win_piece, 3).unwrap();
+
+        board.insert_piece(lose_piece, 4).unwrap();
+        board.insert_piece(lose_piece, 4).unwrap();
+        board.insert_piece(lose_piece, 4).unwrap();
+        board.insert_piece(win_piece, 4).unwrap();
+
+        assert_eq!(Some(win_piece), board.is_winner());
+    }
+
+    #[test]
+    fn is_winner_diagonal_down() {
+        let mut board = GameBoard::default();
+        let win_piece = GamePiece::Red;
+        let lose_piece = GamePiece::Yellow;
+
+        board.insert_piece(lose_piece, 1).unwrap();
+        board.insert_piece(lose_piece, 1).unwrap();
+        board.insert_piece(lose_piece, 1).unwrap();
+        board.insert_piece(win_piece, 1).unwrap();
+
+        board.insert_piece(lose_piece, 2).unwrap();
+        board.insert_piece(lose_piece, 2).unwrap();
+        board.insert_piece(win_piece, 2).unwrap();
+
+        board.insert_piece(lose_piece, 3).unwrap();
+        board.insert_piece(win_piece, 3).unwrap();
+
+        board.insert_piece(win_piece, 4).unwrap();
+
+        assert_eq!(Some(win_piece), board.is_winner());
     }
 }
