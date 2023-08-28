@@ -27,8 +27,9 @@ impl Display for InsertError {
 }
 
 /// Colored game peices, one per player.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub enum GamePiece {
+    #[default]
     Red,
     Yellow,
 }
@@ -101,9 +102,7 @@ impl GameBoard {
     /// Checks for four like pieces in a row horizontally, vertically, and diagonally.
     ///
     /// Returns an [`Option`] containing the [`GamePiece`] of the winning player, or [`None`] if there is no winner.
-    // TODO remove cfg(test) when game loop is implemented
-    #[cfg(test)]
-    fn is_winner(&self) -> Option<GamePiece> {
+    pub(crate) fn is_winner(&self) -> Option<GamePiece> {
         // Horizontal
         for row in 0..GRID_ROWS {
             for col in 0..GRID_COLS - 3 {
@@ -177,9 +176,7 @@ impl GameBoard {
     }
 
     /// Checks if the board is full by seeing if the topmost row is full.
-    // TODO remove cfg(test) when game loop is implemented
-    #[cfg(test)]
-    fn is_full(&self) -> bool {
+    pub(crate) fn is_full(&self) -> bool {
         for space in self.grid[0] {
             if BoardSpace::Empty == space {
                 return false;
@@ -190,7 +187,10 @@ impl GameBoard {
 
     #[cfg(test)]
     fn new(grid: GameGrid) -> Self {
-        Self { grid }
+        Self {
+            grid,
+            ..Default::default()
+        }
     }
 }
 
