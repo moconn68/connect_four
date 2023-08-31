@@ -4,8 +4,13 @@ use super::GameManager;
 #[derive(Clone, Copy, Debug, Default)]
 pub struct OnlineGameManager {}
 
+#[allow(unused_variables)]
 impl GameManager for OnlineGameManager {
-    fn take_turn(&mut self) {
+    fn take_turn(&mut self, column_selection: usize) -> Result<(), super::ManagerError> {
+        todo!()
+    }
+
+    fn check_endgame(&self) -> super::EndgameState {
         todo!()
     }
 
@@ -13,7 +18,7 @@ impl GameManager for OnlineGameManager {
         todo!()
     }
 
-    fn check_endgame(&self) -> super::EndgameState {
+    fn get_next_player(&self) -> &crate::board::GamePiece {
         todo!()
     }
 }

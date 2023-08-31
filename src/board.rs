@@ -4,7 +4,7 @@ const SPACE_EMPTY: char = ' ';
 const SPACE_RED: char = 'R';
 const SPACE_YELLOW: char = 'Y';
 const GRID_ROWS: usize = 6;
-const GRID_COLS: usize = 7;
+pub(crate) const GRID_COLS: usize = 7;
 
 // Errors
 
@@ -37,8 +37,8 @@ pub enum GamePiece {
 impl Display for GamePiece {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            Self::Red => write!(f, "\x1b[91m{}\x1b[0m", SPACE_RED),
-            Self::Yellow => write!(f, "\x1b[93m{}\x1b[0m", SPACE_YELLOW),
+            Self::Red => write!(f, "{}", SPACE_RED),
+            Self::Yellow => write!(f, "{}", SPACE_YELLOW),
         }
     }
 }
