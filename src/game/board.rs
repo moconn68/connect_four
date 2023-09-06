@@ -3,7 +3,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 const SPACE_EMPTY: char = ' ';
 const SPACE_RED: char = 'R';
 const SPACE_YELLOW: char = 'Y';
-const GRID_ROWS: usize = 6;
+pub(crate) const GRID_ROWS: usize = 6;
 pub(crate) const GRID_COLS: usize = 7;
 
 // Errors
@@ -217,6 +217,7 @@ impl Display for GameBoard {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn verify_grid_display() {
         let empty_board = r#"+-1-+-2-+-3-+-4-+-5-+-6-+-7-+

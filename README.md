@@ -8,7 +8,7 @@ A terminal-based implementation of the classic Four-in-a-Row game, most commonly
 
 + Runs directly in your CLI
 + Multiple ways to play
-  + With a friend locally (TODO)
+  + With a friend locally
   + Against AI (TODO)
   + Online against a friend (TODO) or with random matchmaking (TODO)
 

@@ -1,9 +1,10 @@
 pub(crate) mod tui;
 
-use crate::{
+use crate::game::{
     board::{GameBoard, GamePiece},
-    manager::{EndgameState, GameMode},
+    state::EndgameType,
 };
+use crate::manager::GameMode;
 
 /// Defines the behavior of UI components, mainly displaying individual views/screens.
 ///
@@ -22,5 +23,5 @@ pub trait ViewManager {
     /// Shows the endgame board state when a game is over and asks the user if they want to play again.
     ///
     /// Returns user choice to play again where yes = true.
-    fn show_endgame(&mut self, board: &GameBoard, state: &EndgameState) -> bool;
+    fn show_endgame(&mut self, board: &GameBoard, state: &EndgameType) -> bool;
 }

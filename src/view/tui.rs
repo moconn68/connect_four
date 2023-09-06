@@ -1,5 +1,8 @@
-use crate::board::{self, GameBoard, GamePiece};
-use crate::manager::{EndgameState, GameMode};
+use crate::game::{
+    board::{self, GameBoard, GamePiece},
+    state::EndgameType,
+};
+use crate::manager::GameMode;
 use crate::view::ViewManager;
 
 use cursive::{
@@ -91,12 +94,12 @@ impl ViewManager for TuiManager {
         self.runtime.run();
     }
 
-    fn show_endgame(&mut self, board: &GameBoard, state: &EndgameState) -> bool {
+    fn show_endgame(&mut self, board: &GameBoard, state: &EndgameType) -> bool {
         let mut layout = LinearLayout::new(Orientation::Vertical);
         layout.add_child(TextView::new(board.to_string()));
 
         let mut banner = match state {
-            EndgameState::Win(p) => format!("{p} wins!"),
+            EndgameType::Win(p) => format!("{p} wins!"),
             _ => "It's a draw!".to_string(),
         };
         banner.push_str(" Play again?");

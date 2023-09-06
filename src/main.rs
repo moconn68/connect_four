@@ -1,7 +1,7 @@
-/// Contains logic for the game "board" state and interactions.
-pub mod board;
 /// Arbitrates the lifecycle of the game.
 pub mod client;
+/// Core components that comprise the game itself.
+pub mod game;
 /// Executes individual game-specific workflows to advance the game.
 pub mod manager;
 /// UI-related functionality.

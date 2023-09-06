@@ -1,11 +1,11 @@
-use crate::board::{GameBoard, GamePiece};
-
 /// Versus AI.
 pub(crate) mod ai;
 /// Versus friend on same computer.
 pub(crate) mod local;
 /// Online matchmaking.
 pub(crate) mod online;
+
+use crate::game::state::GameState;
 
 #[derive(Clone, Copy, Debug, Default)]
 pub enum GameMode {
@@ -28,17 +28,6 @@ impl TryFrom<i8> for GameMode {
     }
 }
 
-/// Defines possible end-game states.
-#[derive(Clone, Copy, Debug)]
-pub enum EndgameState {
-    /// A given player represented by a [`GamePiece`] has won.
-    Win(GamePiece),
-    /// The board is full; draw.
-    Full,
-    /// No end-game state, play continues.
-    None,
-}
-
 #[derive(Clone, Debug)]
 pub enum ManagerError {
     TakeTurn(String),
@@ -55,12 +44,8 @@ impl std::fmt::Display for ManagerError {
 /// Defines top-level APIs for each game client type.
 /// There will be one implementation per [`crate::client::GameMode`].
 pub trait GameManager {
-    /// Gets the current [`EndgameState`] of the game in progress.
-    fn check_endgame(&self) -> EndgameState;
     /// Workflow for a playing taking a turn from start to finish.
     fn take_turn(&mut self, column_selection: usize) -> Result<(), ManagerError>;
-    /// Returns an immutable reference to the current game board state; mainly used for UI.
-    fn get_board(&self) -> &GameBoard;
-    /// Returns an immutable reference to the next player's game piece; mainly used for UI.
-    fn get_next_player(&self) -> &GamePiece;
+    /// Returns an immutable reference to the current game state; mainly used for UI.
+    fn get_state(&self) -> &GameState;
 }
