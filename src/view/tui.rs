@@ -1,8 +1,8 @@
 use crate::game::{
     board::{self, GameBoard, GamePiece},
     state::EndgameType,
+    GameMode,
 };
-use crate::manager::GameMode;
 use crate::view::ViewManager;
 
 use cursive::{

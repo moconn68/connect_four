@@ -43,6 +43,16 @@ impl Display for GamePiece {
     }
 }
 
+impl GamePiece {
+    pub fn random() -> Self {
+        use rand::Rng;
+        match rand::thread_rng().gen_range(0..=1) {
+            0 => Self::Red,
+            _ => Self::Yellow,
+        }
+    }
+}
+
 /// Possible states for a game "board" space.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 enum BoardSpace {

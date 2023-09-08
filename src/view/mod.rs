@@ -1,10 +1,10 @@
 pub(crate) mod tui;
 
+use crate::game::GameMode;
 use crate::game::{
     board::{GameBoard, GamePiece},
     state::EndgameType,
 };
-use crate::manager::GameMode;
 
 /// Defines the behavior of UI components, mainly displaying individual views/screens.
 ///

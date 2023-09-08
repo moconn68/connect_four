@@ -2,27 +2,18 @@
 pub mod client;
 /// Core components that comprise the game itself.
 pub mod game;
-/// Executes individual game-specific workflows to advance the game.
-pub mod manager;
 /// UI-related functionality.
 pub mod view;
 
-use crate::client::GameClient;
-use crate::manager::{
-    ai::AiGameManager, local::LocalGameManager, online::OnlineGameManager, GameManager, GameMode,
-};
+use crate::client::{FourStackGame, GameClient};
 use crate::view::{tui::TuiManager, ViewManager};
 
 fn main() {
     loop {
         let mut view_manager = TuiManager::new();
-        let game_manager: Box<dyn GameManager> = match view_manager.main_menu() {
-            GameMode::Ai => Box::<AiGameManager>::default(),
-            GameMode::Local => Box::<LocalGameManager>::default(),
-            GameMode::Online => Box::<OnlineGameManager>::default(),
-        };
+        let game_mode = view_manager.main_menu();
 
-        let mut game_client = GameClient::new(game_manager, view_manager);
+        let mut game_client = GameClient::new(game_mode, view_manager);
         if !game_client.game_loop() {
             break;
         }

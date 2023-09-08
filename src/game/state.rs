@@ -11,10 +11,19 @@ pub enum EndgameType {
     None,
 }
 
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug)]
 pub struct GameState {
     board: GameBoard,
     next_player: GamePiece,
+}
+
+impl Default for GameState {
+    fn default() -> Self {
+        Self {
+            board: Default::default(),
+            next_player: GamePiece::random(),
+        }
+    }
 }
 
 impl GameState {
