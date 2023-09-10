@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 cursive = "0.20.0"
+minimax = "0.5.2"
 rand = "0.8.5"

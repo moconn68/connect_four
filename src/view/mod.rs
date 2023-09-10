@@ -7,8 +7,6 @@ use crate::game::{
 };
 
 /// Defines the behavior of UI components, mainly displaying individual views/screens.
-///
-/// These trait methods will usually be expected to return an [`Option`] wrappingi any return value, TODO do I actually want this or should I just get rid of the quit anytime capability
 pub trait ViewManager {
     /// Displays the main menu, including the title splash and game mode selection menu.
     ///

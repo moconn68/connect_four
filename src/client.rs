@@ -1,9 +1,12 @@
+use crate::ai::NaiveEvaluator;
 use crate::game::{
     board::GamePiece,
     state::{EndgameType, GameState},
     GameMode,
 };
 use crate::view::ViewManager;
+
+use minimax::{Negamax, Strategy};
 
 /// High-level functions for the game implementation.
 pub(crate) trait FourStackGame {
@@ -46,9 +49,6 @@ impl<V> GameClient<V> {
 
 impl<V: ViewManager> FourStackGame for GameClient<V> {
     fn game_loop(&mut self) -> bool {
-        // let board = self.game_state.get_board();
-        // let next_player = self.game_state.get_next_player();
-
         loop {
             match self.game_state.check_endgame() {
                 EndgameType::None => (),
@@ -68,6 +68,7 @@ impl<V: ViewManager> FourStackGame for GameClient<V> {
             } else {
                 self.take_turn_adversary();
             }
+            self.game_state.toggle_player();
         }
     }
 
@@ -82,14 +83,88 @@ impl<V: ViewManager> FourStackGame for GameClient<V> {
             .get_board_mut()
             .insert_piece(piece, column)
             .map_err(|e| format!("Invalid move: {e}"))?;
-
-        self.game_state.toggle_player();
-
         Ok(())
     }
 
     fn take_turn_adversary(&mut self) {
-        // TODO implement for AI and Online game modes
-        todo!()
+        // TODO implement for Online game mode
+        match self.game_mode {
+            // TODO this isn't great, should refactor to prevent this from being possible
+            GameMode::Local => unimplemented!("Local game mode should never get here!"),
+            GameMode::Online => todo!(),
+            GameMode::Ai => {
+                let mut strategy = Negamax::new(NaiveEvaluator, 7);
+                let col_choice = strategy.choose_move(&self.game_state).unwrap();
+                let player = *self.game_state.get_next_player();
+                self.game_state
+                    .get_board_mut()
+                    .insert_piece(player, col_choice)
+                    .unwrap();
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{FourStackGame, GameClient};
+    use crate::game::{
+        board::{GameBoard, GamePiece},
+        state::EndgameType,
+        GameMode,
+    };
+    use crate::view::ViewManager;
+
+    #[derive(Clone, Copy, Default)]
+    struct StubViewManager {
+        column: usize,
+    }
+
+    impl StubViewManager {
+        fn set_column(&mut self, column: usize) {
+            self.column = column;
+        }
+    }
+
+    impl ViewManager for StubViewManager {
+        fn main_menu(&mut self) -> crate::game::GameMode {
+            unimplemented!()
+        }
+
+        fn get_column_selection(&mut self, _board: &GameBoard, _player: &GamePiece) -> usize {
+            self.column
+        }
+
+        fn show_error(&mut self, _error: impl Into<String>) {
+            unimplemented!()
+        }
+
+        fn show_endgame(&mut self, _board: &GameBoard, _state: &EndgameType) -> bool {
+            unimplemented!()
+        }
+    }
+
+    #[test]
+    fn take_turn_local_updates_board() {
+        let mut view_manager = StubViewManager::default();
+        view_manager.set_column(1);
+        let mut client = GameClient::new(GameMode::Local, view_manager);
+        let board_before = *client.game_state.get_board();
+
+        client.take_turn_local().unwrap();
+        let board_after = *client.game_state.get_board();
+
+        assert_ne!(board_before, board_after);
+    }
+
+    #[test]
+    fn take_turn_adversary_updates_board() {
+        let mut client = GameClient::new(GameMode::Ai, StubViewManager::default());
+        let board_before = *client.game_state.get_board();
+
+        client.take_turn_adversary();
+        let board_after = *client.game_state.get_board();
+
+        assert_ne!(board_before, board_after);
     }
 }

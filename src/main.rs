@@ -1,3 +1,5 @@
+/// Contains logic for generating moves by AI opponents.
+pub mod ai;
 /// Arbitrates the lifecycle of the game.
 pub mod client;
 /// Core components that comprise the game itself.

@@ -84,7 +84,7 @@ type BoardColumns = [BoardSpace; GRID_COLS];
 type GameGrid = [BoardColumns; GRID_ROWS];
 
 /// Manages the state of the game board.
-#[derive(Clone, Copy, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct GameBoard {
     grid: GameGrid,
 }
