@@ -1,7 +1,37 @@
+use super::{ClientError, GameClient};
 use crate::game::{
     board::GRID_COLS,
     state::{EndgameType, GameState},
 };
+
+use minimax::Strategy;
+
+#[derive(Clone, Copy, Debug, Default)]
+pub struct AiGameClient {
+    game_state: GameState,
+}
+
+impl GameClient for AiGameClient {
+    fn get_current_state(&self) -> GameState {
+        self.game_state
+    }
+    fn handle_input_move(&mut self, column_num: usize) -> Result<GameState, ClientError> {
+        let state_ref = &mut self.game_state;
+        // First handle the user's move
+        super::process_move(state_ref, column_num)?;
+        // Now we generate and handle the AI's move
+        let mut strategy = minimax::Negamax::new(NaiveEvaluator, 7);
+        if let Some(ai_move) = strategy.choose_move(state_ref) {
+            super::process_move(&mut self.game_state, ai_move)
+            // Simulate thinking
+            // TODO uncomment when UI threading behavior is reworked
+            // std::thread::sleep(std::time::Duration::from_secs(1));
+        } else {
+            // Endgame, pass
+            Ok(*state_ref)
+        }
+    }
+}
 
 pub struct FourStackRules;
 impl minimax::Game for FourStackRules {

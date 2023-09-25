@@ -12,6 +12,8 @@ pub trait ViewManager {
     ///
     /// Returns the user-selected [`GameMode`].
     fn main_menu(&mut self) -> GameMode;
+    /// Displays a given [`GameBoard`].
+    fn show_board(&mut self, board: &GameBoard);
     /// Displays the game board and prompts the user for input to get a column number selection.
     ///
     /// Returns the column selection.

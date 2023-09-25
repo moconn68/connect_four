@@ -14,30 +14,29 @@ use cursive::{
 
 const TITLE: &str = "FourStack";
 // Created with https://patorjk.com/software/taag
-const SPLASH: &str = r#" ______               _____ _             _    
+const SPLASH: &str = r" ______               _____ _             _    
 |  ____|             / ____| |           | |   
 | |__ ___  _   _ _ _| (___ | |_ __ _  ___| | __
 |  __/ _ \| | | | '__\___ \| __/ _` |/ __| |/ /
 | | | (_) | |_| | |  ____) | || (_| | (__|   < 
 |_|  \___/ \__,_|_| |_____/ \__\__,_|\___|_|\_\
-"#;
+";
 
 pub struct TuiManager {
     runtime: CursiveRunnable,
 }
 
-impl TuiManager {
-    pub fn new() -> Self {
+impl Default for TuiManager {
+    fn default() -> Self {
         let mut runtime = cursive::default();
         // Application-wide TUI config
         // Set theme to correspond with user's terminal
         runtime.set_theme(Theme::terminal_default());
         // Default base UI layer to prevent background flickering
-        runtime.add_layer(Dialog::default());
+        runtime.add_layer(Dialog::default().title(TITLE));
         Self { runtime }
     }
 }
-
 impl ViewManager for TuiManager {
     fn main_menu(&mut self) -> GameMode {
         let mut layout = LinearLayout::new(Orientation::Vertical);
@@ -61,6 +60,13 @@ impl ViewManager for TuiManager {
         self.runtime
             .take_user_data()
             .expect("Cursive user data should be set to a GameMode!")
+    }
+
+    fn show_board(&mut self, board: &GameBoard) {
+        let board_view = TextView::new(board.to_string());
+        self.runtime
+            .add_layer(Dialog::around(board_view).title(TITLE));
+        self.runtime.run()
     }
 
     fn get_column_selection(&mut self, board: &GameBoard, player: &GamePiece) -> usize {
